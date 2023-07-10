@@ -1,0 +1,24 @@
+.toast {
+	top: 40px;
+}
+.botao-compartilhar{
+	font-family: 'Open Sans',sans-serif;
+	border: none;
+	color: #939ba3;
+	padding: 20px 0;
+	font-size: 13.5px;
+	height: initial;
+	display: table-cell;
+	font-weight: 600;
+	box-shadow: none;
+	line-height: 14px;
+	text-shadow: none;
+	text-align: center;
+	vertical-align: middle;
+	background-image: initial;
+	background-color: transparent;
+}
+.botao-compartilhar::before {
+	content: '\f14d';
+	font-family: 'Font Awesome'; /* Certifique-se de ter a fonte Font Awesome incluída */
+}
