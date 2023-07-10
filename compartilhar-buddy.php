@@ -1,7 +1,7 @@
 <?php
 /**
  * Plugin Name:     Compartilhar Buddy
- * Plugin URI:      www.rtechmkt.com.br
+ * Plugin URI:      https://github.com/Renane10/compartilhar-buddy
  * Description:     Plugin para compartilhamentos de posts do buddypress para não cadastrados
  * Author:          Prozyn10
  * Author URI:      www.rtechmkt.com.br
@@ -79,6 +79,45 @@ function compartilhar_buddy_shortcode() {
 	// Retorne a saída
 	return $output;
 }
+
+// Shortcode para exibir o conteúdo da atividade
+function compartilhar_buddy_content_shortcode($atts) {
+	global $wpdb;
+
+	// Obtenha os atributos do shortcode (se houver)
+	$atts = shortcode_atts(array(
+		'activity_id' => '',
+	), $atts);
+
+	// Execute a consulta no banco de dados para obter o conteúdo da atividade
+	$query = "SELECT content FROM wp_bp_activity WHERE id = " . $atts['activity_id'] . " LIMIT 1";
+	$result = $wpdb->get_var($query);
+
+	// Retorne o conteúdo
+	return $result;
+}
+add_shortcode('compartilhar_buddy_content', 'compartilhar_buddy_content_shortcode');
+
+// Shortcode para exibir o nome de usuário
+function compartilhar_buddy_username_shortcode($atts) {
+	global $wpdb;
+
+	// Obtenha os atributos do shortcode (se houver)
+	$atts = shortcode_atts(array(
+		'activity_id' => '',
+	), $atts);
+
+	// Execute a consulta no banco de dados para obter o nome de usuário
+	$query = "SELECT u.display_name
+        FROM wp_bp_activity AS a
+        INNER JOIN wp_users AS u ON a.user_id = u.ID
+        WHERE a.id = " . $atts['activity_id'] . " LIMIT 1";
+	$result = $wpdb->get_var($query);
+
+	// Retorne o nome de usuário
+	return $result;
+}
+
 add_shortcode('compartilhar_buddy', 'compartilhar_buddy_shortcode');
 
 add_action('bp_init', 'meu_plugin_adicionar_estilo_script');
