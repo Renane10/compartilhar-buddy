@@ -54,23 +54,65 @@ function compartilhar_buddy_shortcode() {
 	global $wpdb;
 
 	// Execute a consulta no banco de dados para obter os dados desejados
-	$query = "SELECT a.user_id, a.content, u.display_name
+	$query = "SELECT a.user_id, a.content, u.display_name, a.type, a.item_id, m.meta_value
 		FROM wp_bp_activity AS a
+		INNER JOIN wp_bp_activity_meta AS m ON a.id = m.activity_id
 		INNER JOIN wp_users AS u ON a.user_id = u.ID
 		WHERE a.id = " . $_GET['activity_id']." LIMIT 1";
 
 	$result = $wpdb->get_results($query);
-
 	// Inicie a saída
 	$output = '';
+
 	// Verifique se existem resultados
 	if ($result) {
-		// Processar os dados e adicioná-los à saída
-		$output .= '<div class="compartilhar-buddy-container">';
-		$output .= '<h2>' . $result[0]->display_name . ' compartilhou esta publicação com você</h2>';
-		$output .= '<p class="compartilhar-buddy-content">' . $result[0]->content . '</p>';
-		$output .= '</div>';
-		$output .= '<style>.compartilhar-buddy-container {display: flex; flex-direction: column; align-items: center; justify-content: center; border: 1px solid #000;} .compartilhar-buddy-content {text-align: center;}</style>';
+		switch($result[0]->type){
+			case 'activity_status':
+				// Processar os dados e adicioná-los à saída
+				$output .= '<div class="compartilhar-buddy-container">';
+				$output .= '<h2>' . $result[0]->display_name . ' compartilhou esta publicação com você</h2>';
+				$output .= '<p class="compartilhar-buddy-content">' . $result[0]->content . '</p>';
+				$output .= '</div>';
+				$output .= '<style>.compartilhar-buddy-container {display: flex; flex-direction: column; align-items: center; justify-content: center; border: 1px solid #000;} .compartilhar-buddy-content {text-align: center;}</style>';
+
+				break;
+			case 'activity_photo':
+
+				$item_id = unserialize($result[0]->meta_value);
+
+				$item_id = key($item_id); // Pega a key
+				// Consulta para obter o p.guid na tabela wp_posts
+				$q_guid = "SELECT guid FROM wp_posts WHERE ID = " . $item_id;
+				$guid_result = $wpdb->get_var($q_guid);
+
+				$output .= '<div class="compartilhar-buddy-container">';
+				$output .= '<h2>' . $result[0]->display_name . ' compartilhou esta publicação com você</h2>';
+				if($result[0]->content) {
+					$output .= '<p class="compartilhar-buddy-content">Comentário:' . $result[0]->content . '</p>';
+				}
+				$output .= '<img src="' . $guid_result . '" alt="Imagem compartilhada" style="width: 100%; height: auto;">';
+				$output .= '</div>';
+				$output .= '<style>.compartilhar-buddy-container {display: flex; flex-direction: column; align-items: center; justify-content: center; border: 1px solid #000;} .compartilhar-buddy-content {text-align: center;}</style>';
+				break;
+			case 'activity_video':
+				$item_id = unserialize($result[0]->meta_value);
+				$item_id = key($item_id); // Pega a key
+
+				// Consulta para obter o p.guid na tabela wp_posts
+				$q_guid = "SELECT guid FROM wp_posts WHERE ID = " . $item_id;
+				$guid_result = $wpdb->get_var($q_guid);
+
+				$output .= '<div class="compartilhar-buddy-container">';
+				$output .= '<h2>' . $result[0]->display_name . ' compartilhou este vídeo com você</h2>';
+				if($result[0]->content) {
+					$output .= '<p class="compartilhar-buddy-content">Comentário:' . $result[0]->content . '</p>';
+				}
+				$output .= '<video src="' . $guid_result . '" controls style="width: 100%; height: auto;"></video>';
+				$output .= '</div>';
+				$output .= '<style>.compartilhar-buddy-container {display: flex; flex-direction: column; align-items: center; justify-content: center; border: 1px solid #000;} .compartilhar-buddy-content {text-align: center;}</style>';
+				break;
+
+		}
 	} else {
 		// Caso não haja resultados
 		$output .= '<p>Nenhum dado encontrado.</p>';
@@ -87,10 +129,9 @@ function compartilhar_buddy_content_shortcode() {
 	global $wpdb;
 
 	// Execute a consulta no banco de dados para obter o conteúdo da atividade
-	$query = "SELECT content FROM wp_bp_activity WHERE id = " . $_GET['activity_id'] . " LIMIT 1";
+	$query = "SELECT content,type FROM wp_bp_activity WHERE id = " . $_GET['activity_id'] . " LIMIT 1";
 
 	$result = $wpdb->get_var($query);
-
 	// Retorne o conteúdo
 	return $result;
 }
