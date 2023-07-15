@@ -34,6 +34,17 @@
   Para visualizar a atividade compartilhada, um usuário não cadastrado deverá acessar a página de compartilhamento específica. Essa página pode ser estilizada utilizando o plugin Elementor para personalização visual.
 </p>
 
+<h2>Shortcodes</h2>
+<p>
+O Compartilhar Buddy disponibiliza os seguintes shortcodes para exibir o conteúdo compartilhado:
+
+- `[compartilhar_buddy]`: Exibe o conteúdo completo da atividade compartilhada, incluindo texto e imagens (se houver).
+- `[compartilhar_buddy_user]`: Exibe o Usuário que fez a postagem
+- `[compartilhar_buddy_content]`: O texto da postagem
+- `[compartilhar_buddy_attachments]`: Exibe apenas a imagem ou o vídeo compartilhado da atividade.
+	
+</p>
+
 <h2>Contribuindo</h2>
 
 <p>
